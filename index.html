@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Plan – Nouveau Départ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0d0d;--card:#161616;--card2:#1c1c1c;--border:#2a2a2a;
+    --gold:#c9a84c;--gold2:#e8c96a;--red:#e05252;--green:#52c97a;
+    --blue:#5289c9;--purple:#a084ca;--orange:#ff8c42;
+    --text:#e8e8e8;--muted:#666;--white:#fff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:24px 16px 80px;}
+  .header{text-align:center;margin-bottom:32px;padding-top:12px;}
+  .header .label{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+  .header h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,14vw,88px);letter-spacing:2px;line-height:0.9;color:var(--white);}
+  .header h1 span{color:var(--gold);}
+  .header .sub{margin-top:12px;color:var(--muted);font-size:13px;font-weight:300;}
+  .date-bar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;}
+  .date-bar .day-label{font-family:'DM Mono',monospace;font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:2px;}
+  .date-bar .date-full{font-size:13px;color:var(--muted);}
+  .streak-badge{background:linear-gradient(135deg,#c9a84c22,#c9a84c44);border:1px solid var(--gold);color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;padding:4px 10px;border-radius:20px;letter-spacing:1px;}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--muted);margin:24px 0 12px;text-transform:uppercase;}
+  .section-title span{color:var(--gold);}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{font-family:'DM Mono',monospace;font-size:11px;padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;letter-spacing:1px;text-transform:uppercase;transition:all 0.15s;}
+  .tab.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:600;}
+  .section{display:none;}
+  .section.active{display:block;}
+
+  /* SCHEDULE */
+  .schedule{display:flex;flex-direction:column;gap:8px;}
+  .slot{display:flex;align-items:stretch;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;}
+  .slot::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--slot-color,var(--border));border-radius:3px 0 0 3px;}
+  .slot-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:48px;padding-top:2px;line-height:1.6;}
+  .slot-content{flex:1;}
+  .slot-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
+  .slot-desc{font-size:12px;color:var(--muted);font-weight:300;line-height:1.5;}
+  .slot-icon{font-size:20px;display:flex;align-items:center;}
+  .slot.prayer{--slot-color:var(--gold);}
+  .slot.food{--slot-color:var(--green);}
+  .slot.work{--slot-color:var(--blue);}
+  .slot.project{--slot-color:var(--purple);}
+  .slot.games{--slot-color:var(--red);}
+  .slot.sleep{--slot-color:#5ab4d6;}
+  .slot.sport{--slot-color:var(--orange);}
+
+  /* HABITS */
+  .habits-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .habit-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;user-select:none;position:relative;overflow:hidden;}
+  .habit-card.done{border-color:var(--green);background:#52c97a0d;}
+  .habit-card.done::after{content:'✓';position:absolute;top:10px;right:12px;color:var(--green);font-size:16px;font-weight:700;}
+  .habit-card .habit-icon{font-size:24px;margin-bottom:8px;}
+  .habit-card .habit-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+  .habit-card .habit-desc{font-size:11px;color:var(--muted);line-height:1.4;}
+  .habit-card .habit-streak{margin-top:8px;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);}
+
+  /* NO-FAP */
+  .counter-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;margin-bottom:16px;}
+  .counter-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+  .counter-num{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--white);line-height:1;}
+  .counter-num span{color:var(--gold);}
+  .counter-realtime{font-family:'DM Mono',monospace;font-size:22px;color:var(--gold);letter-spacing:3px;margin:10px 0 4px;}
+  .counter-realtime-parts{display:flex;justify-content:center;gap:12px;margin-bottom:16px;}
+  .counter-part{display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .counter-part-val{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);line-height:1;}
+  .counter-part-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+  .counter-sep{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--border);line-height:1;padding-top:0;}
+  .counter-unit{font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:20px;}
+  .counter-btns{display:flex;gap:10px;justify-content:center;}
+  .btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;}
+  .btn-gold{background:var(--gold);color:#000;}
+  .btn-gold:hover{background:var(--gold2);}
+  .btn-red{background:transparent;border:1px solid var(--red);color:var(--red);}
+  .btn-red:hover{background:var(--red);color:#fff;}
+  .btn-blue{background:var(--blue);color:#fff;width:100%;text-align:center;padding:14px;font-size:14px;margin-top:10px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;}
+  .btn-blue:hover{opacity:0.85;}
+  .btn-blue:disabled{opacity:0.5;cursor:not-allowed;}
+  .rules-card{background:var(--card);border:1px solid #e0525222;border-radius:12px;padding:18px;}
+  .rules-card .rule{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+  .rules-card .rule:last-child{border-bottom:none;}
+  .rules-card .rule-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);min-width:20px;padding-top:1px;}
+  .rules-card .rule-text{font-size:13px;color:var(--text);line-height:1.5;}
+  .rules-card .rule-text strong{color:var(--white);}
+  .milestones{display:flex;flex-direction:column;gap:8px;}
+  .milestone{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;}
+  .milestone.reached{border-color:var(--gold);background:#c9a84c0d;}
+  .milestone-day{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);min-width:38px;}
+  .milestone-text{font-size:13px;color:var(--text);flex:1;}
+  .milestone-check{font-size:14px;color:var(--muted);}
+  .milestone.reached .milestone-check{color:var(--gold);}
+
+  /* TIPS */
+  .food-tips{display:flex;flex-direction:column;gap:8px;}
+  .food-tip{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.5;}
+  .tip-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+
+  /* VERSE */
+  .verse-card{background:linear-gradient(135deg,#c9a84c0f,#c9a84c05);border:1px solid #c9a84c33;border-radius:14px;padding:22px 20px;text-align:center;}
+  .verse-text{font-size:14px;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:10px;}
+  .verse-ref{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:1px;}
+
+  /* PRAYER */
+  .prayer-card{background:var(--card);border:1px solid #c9a84c22;border-radius:14px;padding:20px;margin-bottom:12px;}
+  .prayer-card .prayer-title{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;margin-bottom:12px;}
+  .prayer-card .prayer-text{font-size:13px;color:var(--text);line-height:1.9;font-style:italic;}
+  .prayer-card .prayer-note{font-size:11px;color:var(--muted);margin-top:10px;font-style:normal;}
+
+  /* SPORT */
+  .sport-day{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:8px;}
+  .sport-day.today{border-color:var(--orange);background:#ff8c420a;}
+  .sport-day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .sport-day-name{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);letter-spacing:1px;}
+  .sport-day.today .sport-day-name{color:var(--orange);}
+  .sport-day-badge{font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:10px;background:#ff8c4222;color:var(--orange);border:1px solid #ff8c4244;}
+  .sport-muscles{display:flex;gap:6px;flex-wrap:wrap;}
+  .muscle-tag{font-size:12px;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text);}
+  .creatine-card{background:var(--card);border:1px solid #52c97a33;border-radius:12px;padding:18px;margin-bottom:16px;}
+  .creatine-card .cr-title{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green);letter-spacing:1px;margin-bottom:12px;}
+  .creatine-card .cr-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start;font-size:13px;color:var(--text);line-height:1.5;}
+  .creatine-card .cr-row:last-child{border-bottom:none;}
+  .creatine-card .cr-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+
+  /* CALORIES */
+  .calorie-input-area{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;}
+  .calorie-input-area textarea{width:100%;background:#111;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:12px;resize:none;min-height:90px;outline:none;line-height:1.5;}
+  .calorie-input-area textarea::placeholder{color:var(--muted);}
+  .calorie-input-area textarea:focus{border-color:var(--gold);}
+  .calorie-result{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;display:none;}
+  .calorie-result.show{display:block;}
+  .calorie-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .cal-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+  .cal-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);}
+  .cal-num span{font-size:16px;color:var(--muted);}
+  .calorie-bars{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .cal-bar-row{display:flex;flex-direction:column;gap:4px;}
+  .cal-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+  .cal-bar-track{height:6px;background:#222;border-radius:3px;overflow:hidden;}
+  .cal-bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease;}
+  .cal-feedback{font-size:13px;color:var(--text);line-height:1.6;padding-top:10px;border-top:1px solid var(--border);}
+  .loading-dots{display:inline-flex;gap:4px;align-items:center;}
+  .loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1.2s infinite;display:inline-block;}
+  .loading-dots span:nth-child(2){animation-delay:0.2s;}
+  .loading-dots span:nth-child(3){animation-delay:0.4s;}
+  @keyframes pulse{0%,80%,100%{opacity:.3}40%{opacity:1}}
+  .meals-history{display:flex;flex-direction:column;gap:6px;}
+  .meal-entry{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;}
+  .meal-entry .meal-name{font-size:13px;color:var(--text);}
+  .meal-entry .meal-cal{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);}
+  .meal-del{font-size:14px;color:var(--muted);cursor:pointer;padding:0 4px;}
+  .error-box{background:#e0525211;border:1px solid #e0525244;border-radius:10px;padding:14px;font-size:13px;color:var(--red);line-height:1.6;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="label">Nouveau Départ</div>
+  <h1>MON<br><span>PLAN</span></h1>
+  <div class="sub">Discipline = Liberté</div>
+</div>
+
+<div class="date-bar">
+  <div>
+    <div class="day-label" id="dayLabel">Lundi</div>
+    <div class="date-full" id="dateLabel">18 mai 2026</div>
+  </div>
+  <div class="streak-badge" id="globalStreak">J+0</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showSection('planning',this)">Planning</button>
+  <button class="tab" onclick="showSection('habits',this)">Habitudes</button>
+  <button class="tab" onclick="showSection('sport',this)">Sport</button>
+  <button class="tab" onclick="showSection('nofap',this)">No-Fap</button>
+  <button class="tab" onclick="showSection('calories',this)">Calories</button>
+  <button class="tab" onclick="showSection('foi',this)">Prières</button>
+</div>
+
+<!-- PLANNING -->
+<div class="section active" id="section-planning">
+  <div class="schedule">
+    <div class="slot prayer">
+      <div class="slot-icon">🙏</div>
+      <div class="slot-content">
+        <div class="slot-title">Réveil + Prière du matin</div>
+        <div class="slot-desc">Avant le téléphone. 5 min. Rends grâce pour le nouveau jour.</div>
+      </div>
+      <div class="slot-time">11h00</div>
+    </div>
+    <div class="slot food">
+      <div class="slot-icon">🥣</div>
+      <div class="slot-content">
+        <div class="slot-title">Petit-déjeuner</div>
+        <div class="slot-desc">Mange bien avant de commencer ta journée.</div>
+      </div>
+      <div class="slot-time">11h15</div>
+    </div>
+    <div class="slot project">
+      <div class="slot-icon">📱</div>
+      <div class="slot-content">
+        <div class="slot-title">OFM — Session matin</div>
+        <div class="slot-desc">Réponses, publications, gestion des comptes. Objectif du jour fixé avant.</div>
+      </div>
+      <div class="slot-time">12h00</div>
+    </div>
+    <div class="slot work">
+      <div class="slot-icon">💼</div>
+      <div class="slot-content">
+        <div class="slot-title">Sorties + Recherche d'emploi</div>
+        <div class="slot-desc">Avec les copains ou seul. Candidatures, LinkedIn, contacts directs.</div>
+      </div>
+      <div class="slot-time">15h00</div>
+    </div>
+    <div class="slot project">
+      <div class="slot-icon">📱</div>
+      <div class="slot-content">
+        <div class="slot-title">OFM — Session soir</div>
+        <div class="slot-desc">Analyse, stratégie, relances. Termine proprement.</div>
+      </div>
+      <div class="slot-time">18h00</div>
+    </div>
+    <div class="slot prayer">
+      <div class="slot-icon">✝️</div>
+      <div class="slot-content">
+        <div class="slot-title">Prière du soir</div>
+        <div class="slot-desc">Avant les jeux. Bilan de ta journée, demande de force.</div>
+      </div>
+      <div class="slot-time">20h30</div>
+    </div>
+    <div class="slot games">
+      <div class="slot-icon">🎮</div>
+      <div class="slot-content">
+        <div class="slot-title">Jeux — Récompense méritée</div>
+        <div class="slot-desc">T'as bossé, t'as mérité. Ta passion, profites-en.</div>
+      </div>
+      <div class="slot-time">21h00</div>
+    </div>
+    <div class="slot sport">
+      <div class="slot-icon">🏋️</div>
+      <div class="slot-content">
+        <div class="slot-title">Salle de sport</div>
+        <div class="slot-desc">Lun/Mar/Mer/Jeu — vers minuit. Créatine après la séance avec un jus de fruit.</div>
+      </div>
+      <div class="slot-time">23h-1h</div>
+    </div>
+    <div class="slot sleep">
+      <div class="slot-icon">🌙</div>
+      <div class="slot-content">
+        <div class="slot-title">Dodo</div>
+        <div class="slot-desc">Après la salle ou les jeux. Demain 11h arrive vite.</div>
+      </div>
+      <div class="slot-time">02h-3h</div>
+    </div>
+  </div>
+</div>
+
+<!-- HABITUDES -->
+<div class="section" id="section-habits">
+  <div class="habits-grid" id="habitsGrid"></div>
+  <div class="verse-card" style="margin-top:16px;">
+    <div class="verse-text">"Je peux tout par celui qui me fortifie."</div>
+    <div class="verse-ref">Philippiens 4:13</div>
+  </div>
+</div>
+
+<!-- SPORT -->
+<div class="section" id="section-sport">
+
+  <div class="creatine-card">
+    <div class="cr-title">💊 Créatine — quand la prendre ?</div>
+    <div class="cr-row"><span class="cr-icon">✅</span><span><strong>Après la séance</strong> — c'est le meilleur moment. Tes muscles sont en mode récupération et absorbent mieux.</span></div>
+    <div class="cr-row"><span class="cr-icon">🥤</span><span>Prends-la avec un <strong>jus de fruit ou une boisson sucrée</strong> — l'insuline générée aide à transporter la créatine dans les muscles.</span></div>
+    <div class="cr-row"><span class="cr-icon">💧</span><span>Bois beaucoup d'eau dans les heures qui suivent. La créatine retient l'eau dans les muscles — c'est normal.</span></div>
+    <div class="cr-row"><span class="cr-icon">⏰</span><span>Les jours sans salle, prends-la quand même à n'importe quel moment. La constance quotidienne prime sur le timing.</span></div>
+  </div>
+
+  <div class="section-title" style="margin-top:0"><span>Ton</span> programme</div>
+  <div id="sportDays"></div>
+  <div class="food-tips" style="margin-top:8px;">
+    <div class="food-tip"><span class="tip-icon">💧</span>Bois avant et pendant la séance — encore plus la nuit</div>
+    <div class="food-tip"><span class="tip-icon">😴</span>Le muscle pousse pendant le sommeil, pas pendant la séance</div>
+    <div class="food-tip"><span class="tip-icon">🍗</span>Mange des protéines dans les 2h après — même tard</div>
+  </div>
+</div>
+
+<!-- NO-FAP -->
+<div class="section" id="section-nofap">
+  <div class="counter-section">
+    <div class="counter-label">Jours sans rechute</div>
+    <div class="counter-num" id="nofapCount">0<span>J</span></div>
+    <div class="counter-realtime-parts" id="nofapRealtimeParts">
+      <div class="counter-part"><div class="counter-part-val" id="rtHours">00</div><div class="counter-part-lbl">heures</div></div>
+      <div class="counter-sep">:</div>
+      <div class="counter-part"><div class="counter-part-val" id="rtMins">00</div><div class="counter-part-lbl">minutes</div></div>
+      <div class="counter-sep">:</div>
+      <div class="counter-part"><div class="counter-part-val" id="rtSecs">00</div><div class="counter-part-lbl">secondes</div></div>
+    </div>
+    <div class="counter-unit" id="nofapSub">Commence aujourd'hui — un jour à la fois.</div>
+    <div class="counter-btns">
+      <button class="btn btn-gold" onclick="startNofap()">Démarrer</button>
+      <button class="btn btn-red" onclick="resetNofap()">Rechute</button>
+    </div>
+  </div>
+  <div class="section-title"><span>Les</span> règles</div>
+  <div class="rules-card">
+    <div class="rule"><div class="rule-num">01</div><div class="rule-text"><strong>Identifie tes déclencheurs.</strong> Seul tard le soir ? Téléphone au lit ? Note-les et élimine-les.</div></div>
+    <div class="rule"><div class="rule-num">02</div><div class="rule-text"><strong>La règle des 10 minutes.</strong> Quand l'envie arrive, fais autre chose 10 min. Elle passe presque toujours.</div></div>
+    <div class="rule"><div class="rule-num">03</div><div class="rule-text"><strong>Pas de téléphone au lit.</strong> Charge-le ailleurs la nuit.</div></div>
+    <div class="rule"><div class="rule-num">04</div><div class="rule-text"><strong>La prière comme bouclier.</strong> Quand t'as envie de craquer, prie avant. Ça marche mieux que la volonté seule.</div></div>
+    <div class="rule"><div class="rule-num">05</div><div class="rule-text"><strong>Une rechute ≠ un échec total.</strong> Tu reprends le compteur et tu continues. Pas de spirale de honte.</div></div>
+  </div>
+  <div class="section-title" style="margin-top:20px;"><span>Jalons</span></div>
+  <div class="milestones" id="milestones"></div>
+</div>
+
+<!-- CALORIES -->
+<div class="section" id="section-calories">
+  <div class="calorie-input-area">
+    <div class="section-title" style="margin-top:0;margin-bottom:10px;"><span>Ce que</span> j'ai mangé</div>
+    <textarea id="foodInput" placeholder="Ex : 2 oeufs, une banane, du riz avec du poulet, une pomme, un coca..."></textarea>
+    <button class="btn-blue" id="analyzeBtn" onclick="analyzeCalories()">Analyser mes calories 🤖</button>
+    <div id="errorBox" class="error-box" style="display:none;"></div>
+  </div>
+  <div class="calorie-result" id="calorieResult">
+    <div class="calorie-total">
+      <div>
+        <div class="cal-label">Total du jour</div>
+        <div class="cal-num" id="calTotal">0 <span>kcal</span></div>
+      </div>
+      <div style="text-align:right;">
+        <div class="cal-label">Objectif</div>
+        <div style="font-family:'DM Mono',monospace;font-size:14px;color:var(--gold);">2200 kcal</div>
+      </div>
+    </div>
+    <div class="calorie-bars">
+      <div class="cal-bar-row">
+        <div class="cal-bar-label"><span>Protéines</span><span id="protVal">0g</span></div>
+        <div class="cal-bar-track"><div class="cal-bar-fill" id="protBar" style="width:0%;background:var(--blue);"></div></div>
+      </div>
+      <div class="cal-bar-row">
+        <div class="cal-bar-label"><span>Glucides</span><span id="glucVal">0g</span></div>
+        <div class="cal-bar-track"><div class="cal-bar-fill" id="glucBar" style="width:0%;background:var(--green);"></div></div>
+      </div>
+      <div class="cal-bar-row">
+        <div class="cal-bar-label"><span>Lipides</span><span id="lipVal">0g</span></div>
+        <div class="cal-bar-track"><div class="cal-bar-fill" id="lipBar" style="width:0%;background:var(--gold);"></div></div>
+      </div>
+    </div>
+    <div class="cal-feedback" id="calFeedback"></div>
+  </div>
+  <div id="mealHistorySection" style="display:none;">
+    <div class="section-title"><span>Repas</span> du jour</div>
+    <div class="meals-history" id="mealsHistory"></div>
+  </div>
+</div>
+
+<!-- PRIÈRES -->
+<div class="section" id="section-foi">
+  <div class="verse-card" style="margin-bottom:16px;">
+    <div class="verse-text">"Car Dieu ne nous a pas donné un esprit de timidité, mais un esprit de force, d'amour et de sagesse."</div>
+    <div class="verse-ref">2 Timothée 1:7</div>
+  </div>
+  <div class="section-title"><span>Prière</span> du matin</div>
+  <div class="prayer-card">
+    <div class="prayer-title">🌅 Au réveil — 11h00</div>
+    <div class="prayer-text">
+      "Seigneur, merci pour ce nouveau jour que Tu m'as donné.<br><br>
+      Merci pour ma vie, ma famille, ma santé et tout ce que j'ai.<br><br>
+      Aujourd'hui je Te demande Ta force et Ta sagesse pour faire les bons choix.<br><br>
+      Guide mes pas, protège-moi des tentations et aide-moi à devenir la meilleure version de moi-même.<br><br>
+      Que tout ce que je fais aujourd'hui Te glorifie.<br><br>
+      Amen."
+    </div>
+    <div class="prayer-note">💡 Dis-la à voix haute, même à voix basse. Ça change tout.</div>
+  </div>
+  <div class="section-title"><span>Prière</span> du soir</div>
+  <div class="prayer-card">
+    <div class="prayer-title">🌆 Avant les jeux — 20h30</div>
+    <div class="prayer-text">
+      "Seigneur, merci pour cette journée.<br><br>
+      Merci pour ce que j'ai accompli, et pardonne-moi pour ce que j'ai mal fait ou pas fait.<br><br>
+      Je Te confie cette nuit, mon sommeil et mon repos.<br><br>
+      Donne-moi la force de me lever demain avec courage et discipline.<br><br>
+      Protège-moi et protège ma famille.<br><br>
+      Amen."
+    </div>
+  </div>
+  <div class="section-title"><span>Prière</span> contre la tentation</div>
+  <div class="prayer-card">
+    <div class="prayer-title">⚡ Quand t'as envie de craquer</div>
+    <div class="prayer-text">
+      "Seigneur, je sens la tentation en ce moment.<br><br>
+      Tu as dit que Tu ne laisses pas Tes enfants être tentés au-delà de leurs forces.<br><br>
+      Donne-moi la force de résister maintenant, à cet instant précis.<br><br>
+      Je Te fais confiance.<br><br>
+      Amen."
+    </div>
+    <div class="prayer-note">📖 1 Corinthiens 10:13 — "Dieu ne permettra pas que vous soyez tentés au-delà de vos forces."</div>
+  </div>
+  <div class="section-title"><span>Prière</span> pour le travail</div>
+  <div class="prayer-card">
+    <div class="prayer-title">💼 Avant l'OFM ou la recherche d'emploi</div>
+    <div class="prayer-text">
+      "Seigneur, je m'apprête à travailler.<br><br>
+      Bénis ce que mes mains vont faire.<br><br>
+      Donne-moi la concentration, la créativité et la persévérance.<br><br>
+      Ouvre les bonnes portes en temps voulu.<br><br>
+      Amen."
+    </div>
+  </div>
+  <div class="verse-card" style="margin-top:8px;">
+    <div class="verse-text">"C'est lui qui donne de la force à celui qui est fatigué, et qui multiplie la vigueur de celui qui est à bout de forces."</div>
+    <div class="verse-ref">Ésaïe 40:29</div>
+  </div>
+</div>
+
+<script>
+const TODAY=new Date().toDateString();
+function getData(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
+function setData(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+
+// DATE
+const DAYS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MONTHS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const now=new Date();
+document.getElementById('dayLabel').textContent=DAYS[now.getDay()];
+document.getElementById('dateLabel').textContent=`${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+
+// TABS
+function showSection(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+}
+
+// HABITS
+const habitDefs=[
+  {id:'wake',icon:'⏰',name:'Réveil 11h',desc:'Lever avant 11h15'},
+  {id:'prayer_am',icon:'🙏',name:'Prière matin',desc:'Avant le téléphone'},
+  {id:'prayer_pm',icon:'✝️',name:'Prière soir',desc:'Avant les jeux'},
+  {id:'nofap_today',icon:'💪',name:'No-Fap',desc:'Journée clean'},
+  {id:'job',icon:'💼',name:'Recherche emploi',desc:'Candidatures envoyées'},
+  {id:'ofm',icon:'📱',name:'OFM bossé',desc:'Sessions complètes'},
+  {id:'sport_today',icon:'🏋️',name:'Salle faite',desc:'Séance terminée'},
+  {id:'water',icon:'💧',name:'1.5L eau',desc:'Hydratation ok'},
+];
+
+function loadHabits(){
+  let habits=getData('habits_'+TODAY,{});
+  const grid=document.getElementById('habitsGrid');
+  grid.innerHTML='';
+  habitDefs.forEach(h=>{
+    const done=!!habits[h.id];
+    const streak=getData('streak_'+h.id,0);
+    const card=document.createElement('div');
+    card.className='habit-card'+(done?' done':'');
+    card.innerHTML=`<div class="habit-icon">${h.icon}</div><div class="habit-name">${h.name}</div><div class="habit-desc">${h.desc}</div><div class="habit-streak">🔥 ${streak} jour${streak!==1?'s':''}</div>`;
+    card.onclick=()=>toggleHabit(h.id);
+    grid.appendChild(card);
+  });
+  updateGlobalStreak();
+}
+
+function toggleHabit(id){
+  let habits=getData('habits_'+TODAY,{});
+  habits[id]=!habits[id];
+  setData('habits_'+TODAY,habits);
+  loadHabits();
+}
+
+function updateGlobalStreak(){
+  const start=getData('startDate',null);
+  if(!start){document.getElementById('globalStreak').textContent='J+0';return;}
+  const diff=Math.floor((Date.now()-new Date(start))/86400000);
+  document.getElementById('globalStreak').textContent='J+'+diff;
+}
+
+// SPORT
+const sportProgram=[
+  {day:'Lundi',muscles:['Pectoraux','Biceps']},
+  {day:'Mardi',muscles:['Dos','Triceps']},
+  {day:'Mercredi',muscles:['Épaules','Avant-bras']},
+  {day:'Jeudi',muscles:['Jambes']},
+];
+
+function loadSport(){
+  const todayIdx=now.getDay();
+  const el=document.getElementById('sportDays');
+  el.innerHTML='';
+  sportProgram.forEach((sp,i)=>{
+    const isToday=todayIdx===(i+1);
+    const div=document.createElement('div');
+    div.className='sport-day'+(isToday?' today':'');
+    div.innerHTML=`
+      <div class="sport-day-header">
+        <div class="sport-day-name">${sp.day} — ~Minuit</div>
+        ${isToday?'<div class="sport-day-badge">AUJOURD\'HUI</div>':''}
+      </div>
+      <div class="sport-muscles">${sp.muscles.map(m=>`<div class="muscle-tag">${m}</div>`).join('')}</div>`;
+    el.appendChild(div);
+  });
+}
+
+// NO-FAP
+const milestoneData=[
+  {days:1,text:'Premier jour — la volonté se réveille'},
+  {days:3,text:'Les pics d\'envie commencent à s\'espacer'},
+  {days:7,text:'1 semaine — énergie et clarté mentale améliorées'},
+  {days:14,text:'2 semaines — confiance en toi qui monte'},
+  {days:30,text:'1 mois — tu reprends le contrôle de ton mental'},
+  {days:60,text:'2 mois — transformation réelle, visible'},
+  {days:90,text:'90 jours — une nouvelle version de toi'},
+];
+
+let nofapTimerInterval=null;
+const pad=n=>String(n).padStart(2,'0');
+
+function updateNofapRealtime(){
+  const startTs=getData('nofap_start',null);
+  if(!startTs){
+    document.getElementById('rtHours').textContent='00';
+    document.getElementById('rtMins').textContent='00';
+    document.getElementById('rtSecs').textContent='00';
+    return;
+  }
+  const elapsed=Math.max(0,Date.now()-startTs);
+  const totalSecs=Math.floor(elapsed/1000);
+  const days=Math.floor(totalSecs/86400);
+  const hours=Math.floor((totalSecs%86400)/3600);
+  const mins=Math.floor((totalSecs%3600)/60);
+  const secs=totalSecs%60;
+  document.getElementById('nofapCount').innerHTML=days+'<span>J</span>';
+  document.getElementById('rtHours').textContent=pad(hours);
+  document.getElementById('rtMins').textContent=pad(mins);
+  document.getElementById('rtSecs').textContent=pad(secs);
+}
+
+function startNofapTimer(){
+  if(nofapTimerInterval)clearInterval(nofapTimerInterval);
+  updateNofapRealtime();
+  nofapTimerInterval=setInterval(updateNofapRealtime,1000);
+}
+
+function loadNofap(){
+  const startTs=getData('nofap_start',null);
+  let d=0;
+  if(startTs)d=Math.floor((Date.now()-startTs)/86400000);
+  document.getElementById('nofapCount').innerHTML=d+'<span>J</span>';
+  const msgs=['Commence aujourd\'hui — un jour à la fois.','Premier jour — tu tiens bon.','Jour 2 — continue, ça passe.','3 jours — les pics s\'espacent.','4 jours — t\'es dans le rythme.','5 jours — force mentale.','6 jours — presque une semaine.','Une semaine 🔥 Énergie en hausse.'];
+  document.getElementById('nofapSub').textContent=msgs[Math.min(d,msgs.length-1)]||`${d} jours de discipline. 💪`;
+  const ml=document.getElementById('milestones');
+  ml.innerHTML='';
+  milestoneData.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='milestone'+(d>=m.days?' reached':'');
+    div.innerHTML=`<div class="milestone-day">J+${m.days}</div><div class="milestone-text">${m.text}</div><div class="milestone-check">${d>=m.days?'✓':'○'}</div>`;
+    ml.appendChild(div);
+  });
+  startNofapTimer();
+}
+
+function startNofap(){
+  if(!getData('nofap_start',null)){
+    const ts=Date.now();
+    setData('nofap_start',ts);
+    setData('startDate',ts);
+  }
+  loadNofap();
+  updateGlobalStreak();
+}
+
+function resetNofap(){
+  if(confirm('Rechute confirmée ? Le compteur repart à zéro.\nC\'est pas une fin, c\'est un recommencement.')){
+    setData('nofap_start',null);
+    if(nofapTimerInterval)clearInterval(nofapTimerInterval);
+    loadNofap();
+  }
+}
+
+// CALORIES
+let currentMeals=getData('meals_'+TODAY,[]);
+
+function renderMealHistory(){
+  const section=document.getElementById('mealHistorySection');
+  const list=document.getElementById('mealsHistory');
+  if(currentMeals.length===0){section.style.display='none';return;}
+  section.style.display='block';
+  list.innerHTML='';
+  currentMeals.forEach((m,i)=>{
+    const div=document.createElement('div');
+    div.className='meal-entry';
+    div.innerHTML=`<div class="meal-name">${m.name}</div><div style="display:flex;align-items:center;gap:8px;"><div class="meal-cal">${m.kcal} kcal</div><div class="meal-del" onclick="deleteMeal(${i})">✕</div></div>`;
+    list.appendChild(div);
+  });
+}
+
+function deleteMeal(i){
+  currentMeals.splice(i,1);
+  setData('meals_'+TODAY,currentMeals);
+  renderMealHistory();
+}
+
+async function analyzeCalories(){
+  const input=document.getElementById('foodInput').value.trim();
+  if(!input)return;
+  const btn=document.getElementById('analyzeBtn');
+  const resultEl=document.getElementById('calorieResult');
+  const feedbackEl=document.getElementById('calFeedback');
+  const errorBox=document.getElementById('errorBox');
+
+  btn.disabled=true;
+  btn.textContent='Analyse en cours...';
+  errorBox.style.display='none';
+  resultEl.classList.add('show');
+  feedbackEl.innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div> Analyse en cours...';
+  document.getElementById('calTotal').innerHTML='... <span>kcal</span>';
+
+  const allFood=currentMeals.map(m=>m.name).join(', ')+(currentMeals.length?', ':'')+input;
+
+  try{
+    const response=await fetch("/api/analyze-calories",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({allFood,newInput:input})
+    });
+
+    if(!response.ok){
+      const err=await response.json().catch(()=>({}));
+      throw new Error(err.error?.message||`Erreur ${response.status}`);
+    }
+
+    const parsed=await response.json();
+
+    currentMeals.push({name:parsed.new_item_name||input,kcal:parsed.new_item_kcal||0});
+    setData('meals_'+TODAY,currentMeals);
+    renderMealHistory();
+
+    document.getElementById('calTotal').innerHTML=`${parsed.total_kcal} <span>kcal</span>`;
+    document.getElementById('protVal').textContent=parsed.proteines_g+'g';
+    document.getElementById('glucVal').textContent=parsed.glucides_g+'g';
+    document.getElementById('lipVal').textContent=parsed.lipides_g+'g';
+    document.getElementById('protBar').style.width=Math.min((parsed.proteines_g/150)*100,100)+'%';
+    document.getElementById('glucBar').style.width=Math.min((parsed.glucides_g/250)*100,100)+'%';
+    document.getElementById('lipBar').style.width=Math.min((parsed.lipides_g/70)*100,100)+'%';
+    if(parsed.total_kcal>2500)document.getElementById('calTotal').style.color='var(--red)';
+    else if(parsed.total_kcal>1800)document.getElementById('calTotal').style.color='var(--green)';
+    feedbackEl.textContent=parsed.bilan;
+    document.getElementById('foodInput').value='';
+
+  }catch(e){
+    resultEl.classList.remove('show');
+    errorBox.style.display='block';
+    errorBox.innerHTML=`⚠️ Impossible d'analyser pour le moment. Réessaie dans quelques secondes.`;
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Analyser mes calories 🤖';
+  }
+}
+
+// INIT
+loadHabits();
+loadNofap();
+loadSport();
+renderMealHistory();
+</script>
+</body>
+</html>
